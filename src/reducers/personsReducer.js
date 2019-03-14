@@ -1,5 +1,3 @@
-import { arrayMove } from "react-sortable-hoc";
-
 import {
   ADD_PERSON,
   DELETE_PERSON,
@@ -30,11 +28,7 @@ export default (state = {}, action) => {
     case REORDER_LIST:
       return {
         ...state,
-        persons: arrayMove(
-          state.persons,
-          action.payload.oldIndex,
-          action.payload.newIndex
-        )
+        persons: payload
       };
     default:
       return state;

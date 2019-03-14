@@ -1,5 +1,6 @@
 import { default as pipedrive } from "../api/default";
 import { api_tokken } from "../api/api";
+import { arrayMove } from "react-sortable-hoc";
 import {
   FETCH_PERSONS,
   FETCH_PERSON_FIELDS,
@@ -41,12 +42,36 @@ export const fetchPersonFields = () => async dispatch => {
   });
 };
 
-export function orderList(oldIndex, newIndex) {
-  return {
+export const orderList = (
+  oldIndex,
+  newIndex,
+  persons,
+  pageNumber,
+  personsPerPage
+) => async dispatch => {
+  const rightIndex = (pageNumber - 1) * personsPerPage;
+  oldIndex += rightIndex;
+  newIndex += rightIndex;
+
+  const data = arrayMove(persons, oldIndex, newIndex);
+
+  const newI = data.find((e, index) => index === newIndex);
+  newI.OrderId = newIndex;
+  const oldI = data.find((e, index) => index === oldIndex);
+  oldI.OrderId = oldIndex;
+
+  dispatch({
     type: REORDER_LIST,
-    payload: { oldIndex, newIndex }
-  };
-}
+    payload: data
+  });
+  await pipedrive.put(`/persons/${newI.ID}?api_token=${api_tokken}`, {
+    "924f2715df861882889257f4031a080be2b08c1c": newIndex
+  });
+
+  await pipedrive.put(`/persons/${oldI.ID}?api_token=${api_tokken}`, {
+    "924f2715df861882889257f4031a080be2b08c1c": oldIndex
+  });
+};
 
 export const fetchPersonById = id => async dispatch => {
   const response = await pipedrive.get(
@@ -68,7 +93,8 @@ export const addNewPerson = person => async dispatch => {
   });
 };
 
-export const editPersonById = (id, person) => async dispatch => {
+const editPersonById = (id, person) => async dispatch => {
+  console.log("hit");
   const response = await pipedrive.put(
     `/persons/${id}?api_token=${api_tokken}`,
     person

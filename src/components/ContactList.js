@@ -201,10 +201,20 @@ class ContactList extends React.Component {
     }
   };
 
+  initialSort = (data = []) => {
+    return data.sort((a, b) => {
+      return (
+        (a.OrderId === null) - (b.OrderId === null) ||
+        +(a.OrderId > b.OrderId) ||
+        -(a.OrderId < b.OrderId)
+      );
+    });
+  };
+
   sort = e => {
     const data = this.state.personsFiltered
-      ? this.state.personsFiltered
-      : this.props.persons;
+      ? this.initialSort(this.state.personsFiltered)
+      : this.initialSort(this.props.persons);
     if (!e) {
       return data || [];
     }
@@ -233,6 +243,16 @@ class ContactList extends React.Component {
       default:
         return data;
     }
+  };
+
+  orderList = (oldIndex, newIndex) => {
+    this.props.orderList(
+      oldIndex,
+      newIndex,
+      this.props.persons,
+      this.state.currentPage,
+      this.state.personsPerPage
+    );
   };
 
   render() {
@@ -400,7 +420,9 @@ class ContactList extends React.Component {
         <List>
           <SortableList
             items={currentPersons}
-            onSortEnd={this.props.orderList}
+            onSortEnd={({ oldIndex, newIndex }) =>
+              this.orderList(oldIndex, newIndex)
+            }
             axis="y"
             pressDelay={200}
             helperClass="test"
@@ -434,9 +456,9 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = (dispatch, props) => ({
-  orderList: ({ oldIndex, newIndex }) => {
-    dispatch(orderList(oldIndex, newIndex));
+const mapDispatchToProps = dispatch => ({
+  orderList: (oldIndex, newIndex, items, currentPage, personsPerPage) => {
+    dispatch(orderList(oldIndex, newIndex, items, currentPage, personsPerPage));
   },
   fetchPersons: () => {
     dispatch(fetchPersons());

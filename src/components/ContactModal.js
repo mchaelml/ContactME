@@ -152,6 +152,7 @@ class ContactModal extends React.Component {
 
   render() {
     const { closeModal, person, addNewPerson } = this.props;
+
     return (
       <Modal onClick={() => closeModal()}>
         <Body>
