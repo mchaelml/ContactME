@@ -393,7 +393,11 @@ class ContactList extends React.Component {
           <FilterBox>
             <Filter>Per Page:</Filter>
             <StyledDropdown
-              value={this.state.sortBy ? this.state.sortBy : "Select..."}
+              value={
+                this.state.personsPerPage
+                  ? this.state.personsPerPage.toString()
+                  : "Select..."
+              }
               options={[
                 {
                   value: 5,
