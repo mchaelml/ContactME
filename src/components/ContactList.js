@@ -61,7 +61,7 @@ const Filter = styled.div`
 `;
 
 const FilterInput = styled.input`
-  width: 90%;
+  width: 80%;
   height: 35px;
   margin-top: 5px;
   border: 1px solid #d2d2d2;
@@ -70,7 +70,7 @@ const FilterInput = styled.input`
   text-align: center;
 `;
 const InputButton = styled.button`
-  width: 10%;
+  width: 20%;
   height: 35px;
   margin-top: 5px;
   border: 1px solid #d2d2d2;
@@ -245,6 +245,12 @@ class ContactList extends React.Component {
     }
   };
 
+  changePersonsPerPage = n => {
+    this.setState({
+      personsPerPage: n
+    });
+  };
+
   orderList = (oldIndex, newIndex) => {
     this.props.orderList(
       oldIndex,
@@ -364,12 +370,13 @@ class ContactList extends React.Component {
     return (
       <>
         <Title>
-          People's List
+          People's List :{" "}
+          {personsFiltered ? personsFiltered.length : persons.length}
           <NewPerson onClick={() => this.openCloseNewPersonModal()} />
         </Title>
         <FilterContainer>
           <FilterBox>
-            <Filter>Search Name</Filter>
+            <Filter>Name</Filter>
             <Inline>
               <FilterInput
                 value={this.state.filterByName}
@@ -384,10 +391,29 @@ class ContactList extends React.Component {
             </Inline>
           </FilterBox>
           <FilterBox>
-            <Filter>N of People:</Filter>
-            <Filter height="35">
-              {personsFiltered ? personsFiltered.length : persons.length}
-            </Filter>
+            <Filter>Per Page:</Filter>
+            <StyledDropdown
+              value={this.state.sortBy ? this.state.sortBy : "Select..."}
+              options={[
+                {
+                  value: 5,
+                  label: 5
+                },
+                {
+                  name: 10,
+                  label: 10
+                },
+                {
+                  name: 25,
+                  label: 25
+                },
+                {
+                  name: 100,
+                  label: 100
+                }
+              ]}
+              onChange={e => this.changePersonsPerPage(e.value)}
+            />
           </FilterBox>
           <FilterBox>
             <Filter>Sort By</Filter>

@@ -9,8 +9,9 @@ import "react-dropdown/style.css";
 const Column = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: ${props => (props.width ? props.width : "100%")};
   align-items: ${props => props.alignItems || "normal"};
+  ${props => (props.flexEnd ? "justify-content: flex-end" : null)}
 `;
 
 const FormBg = styled.div`
@@ -30,13 +31,14 @@ const FormBg = styled.div`
 const Error = styled.div`
   color: red;
   text-align: center;
+  position: ${props => (props.abs ? "absolute" : null)};
 `;
 
 const Label = styled.label``;
 
 const Input = styled.div`
   padding: 5px 0 10px 0;
-  width: 100%;
+  width: ${props => (props.width ? props.width : "100%")};
 `;
 
 const InputBox = styled.input`
@@ -48,8 +50,8 @@ const InputBox = styled.input`
 
 const DropdownStyled = styled(Dropdown)`
   & > div {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: ${props => (props.inline ? "3.5px" : "5px")};
+    padding-bottom: ${props => (props.inline ? "2.5px" : "5px")};
   }
 `;
 
@@ -75,33 +77,51 @@ const AddButton = styled.button`
   border-radius: 5px;
 `;
 
+const Inline = styled.div`
+  display: flex;
+`;
+
 class NewPersonForm extends React.Component {
-  renderInput = ({ input, label, meta, mode, disabled, choices = [] }) => {
+  renderInput = ({
+    input,
+    label,
+    meta,
+    mode,
+    choices = [],
+    flexEnd = false,
+    inline = false,
+    width,
+    abs = false
+  }) => {
     return (
       <React.Fragment>
         {mode === "input" && (
-          <Column>
+          <Column width={width}>
             <Label>{label}</Label>
             <Input>
-              <InputBox {...input} disabled={disabled} />
+              <InputBox {...input} />
             </Input>
-            {meta.error && meta.touched && <Error>{meta.error}</Error>}
+            {meta.error && meta.touched && (
+              <Error abs={abs}>{meta.error}</Error>
+            )}
           </Column>
         )}
         {mode === "dropdown" && (
-          <Column>
+          <Column flexEnd width={width}>
             <Label>{label}</Label>
             <Input>
               <DropdownStyled
+                inline
                 {...input}
-                disabled={disabled}
                 options={Object.values(choices || []).map(option => ({
                   value: option.id,
                   label: option.name
                 }))}
               />
             </Input>
-            {meta.error && meta.touched && <Error>{meta.error}</Error>}
+            {meta.error && meta.touched && (
+              <Error abs={abs}>{meta.error}</Error>
+            )}
           </Column>
         )}
       </React.Fragment>
@@ -115,14 +135,14 @@ class NewPersonForm extends React.Component {
       org_id: person.organization.value,
       email: [
         {
-          label: "work",
+          label: person.emailType.label,
           primary: true,
           value: person.email
         }
       ],
       phone: [
         {
-          label: "work",
+          label: person.phoneType.label,
           primary: true,
           value: person.phone
         }
@@ -143,22 +163,69 @@ class NewPersonForm extends React.Component {
               component={this.renderInput}
               label="Full Name"
               mode="input"
-              disabled={this.props.disabled}
+              abs
             />
-            <Field
-              name="email"
-              component={this.renderInput}
-              label="Email"
-              mode="input"
-              disabled={this.props.disabled}
-            />
-            <Field
-              name="phone"
-              component={this.renderInput}
-              label="Phone"
-              mode="input"
-              disabled={this.props.disabled}
-            />
+            <Inline>
+              <Field
+                width="70%"
+                name="email"
+                component={this.renderInput}
+                label="Email"
+                mode="input"
+                abs
+              />
+              <Field
+                width="30%"
+                name="emailType"
+                component={this.renderInput}
+                label=""
+                mode="dropdown"
+                inline
+                flexEnd
+                choices={[
+                  {
+                    id: 1,
+                    name: "Work"
+                  },
+                  {
+                    id: 2,
+                    name: "Home"
+                  },
+                  { id: 3, name: "Other" }
+                ]}
+              />
+            </Inline>
+            <Inline>
+              <Field
+                width="70%"
+                name="phone"
+                component={this.renderInput}
+                label="Phone"
+                mode="input"
+                abs
+              />
+              <Field
+                width="30%"
+                name="phoneType"
+                component={this.renderInput}
+                label=""
+                mode="dropdown"
+                flexEnd
+                inline
+                choices={[
+                  {
+                    id: 1,
+                    name: "Work"
+                  },
+                  {
+                    id: 2,
+                    name: "Home"
+                  },
+                  { id: 3, name: "Mobile" },
+                  { id: 4, name: "Other" }
+                ]}
+              />
+            </Inline>
             <Field
               name="organization"
               component={this.renderInput}
@@ -181,7 +248,6 @@ class NewPersonForm extends React.Component {
                   name: "Entire company (shared)"
                 }
               ]}
-              disabled={this.props.disabled}
             />
           </FormBg>
           <Bottom align="center">
@@ -195,13 +261,15 @@ class NewPersonForm extends React.Component {
 
 const validate = vals => {
   const errors = {};
-  if (!vals.name) errors.name = "Name can not be empty";
+  if (!vals.name) errors.name = "Full Name can not be empty";
   if (vals.visible === "Select...")
     errors.visible = "Have to select the visibility property";
   if (vals.organization === "Select...")
     errors.organization = "Have to select the organization";
   if (!vals.phone) errors.phone = "Phone can not be empty";
-  if (!vals.email) errors.email = "Email can not be empty";
+  if (!vals.email) {
+    errors.email = "Email can not be empty";
+  }
   if (
     vals.email &&
     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(vals.email)
@@ -217,7 +285,9 @@ const mapStateToProps = state => {
   return {
     initialValues: {
       visible: "Select...",
-      organization: "Select..."
+      organization: "Select...",
+      emailType: "Work",
+      phoneType: "Work"
     },
     organizations: state.persons.organizations
   };

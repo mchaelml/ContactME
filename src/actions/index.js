@@ -6,7 +6,6 @@ import {
   FETCH_PERSON_FIELDS,
   REORDER_LIST,
   FETCH_PERSON,
-  EDIT_PERSON,
   ADD_PERSON,
   DELETE_PERSON
 } from "../actions/types";
@@ -89,18 +88,6 @@ export const addNewPerson = person => async dispatch => {
   });
   dispatch({
     type: ADD_PERSON,
-    payload: response.data
-  });
-};
-
-const editPersonById = (id, person) => async dispatch => {
-  console.log("hit");
-  const response = await pipedrive.put(
-    `/persons/${id}?api_token=${api_tokken}`,
-    person
-  );
-  dispatch({
-    type: EDIT_PERSON,
     payload: response.data
   });
 };
