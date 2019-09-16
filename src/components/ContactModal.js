@@ -152,7 +152,7 @@ class ContactModal extends React.Component {
 
   render() {
     const { closeModal, person, addNewPerson } = this.props;
-
+    console.log(person);
     return (
       <Modal onClick={() => closeModal()}>
         <Body>
@@ -214,9 +214,9 @@ class ContactModal extends React.Component {
                     <Left>
                       <Title>Location</Title>
                     </Left>
-                    <Right>
-                      <Value>{person["Full/combined address"]}</Value>
-                    </Right>
+                    <Value>
+                      <Value>{person.Location}</Value>
+                    </Value>
                   </Inline>
                 </Details>
                 <Bottom>

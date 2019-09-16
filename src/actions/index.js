@@ -1,5 +1,4 @@
-import { default as pipedrive } from "../api/default";
-import { api_tokken } from "../api/api";
+import { default as api } from "../api/default";
 import { arrayMove } from "react-sortable-hoc";
 import {
   FETCH_PERSONS,
@@ -11,8 +10,9 @@ import {
 } from "../actions/types";
 
 export const fetchPersons = () => async dispatch => {
-  const response = await pipedrive.get(`persons?api_token=${api_tokken}`);
-  const response2 = await pipedrive.get(`personFields?api_token=${api_tokken}`);
+  const response = await api.get(`persons`);
+  const response2 = await api.get(`personFields`);
+  console.log(response2);
 
   response.data.data.forEach(item =>
     Object.values(response2.data)[1].forEach(key => {
@@ -34,7 +34,7 @@ export const fetchPersons = () => async dispatch => {
 };
 
 export const fetchPersonFields = () => async dispatch => {
-  const response = await pipedrive.get(`personFields?api_token=${api_tokken}`);
+  const response = await api.get(`personFields`);
   dispatch({
     type: FETCH_PERSON_FIELDS,
     payload: response.data
@@ -63,18 +63,18 @@ export const orderList = (
     type: REORDER_LIST,
     payload: data
   });
-  await pipedrive.put(`/persons/${newI.ID}?api_token=${api_tokken}`, {
-    "924f2715df861882889257f4031a080be2b08c1c": newIndex
+  await api.put(`/persons/${newI.ID}`, {
+    "9a7786715d18924b981f7a5da75c0fa84c3a152f": newIndex
   });
 
-  await pipedrive.put(`/persons/${oldI.ID}?api_token=${api_tokken}`, {
-    "924f2715df861882889257f4031a080be2b08c1c": oldIndex
+  await api.put(`/persons/${oldI.ID}`, {
+    "9a7786715d18924b981f7a5da75c0fa84c3a152f": oldIndex
   });
 };
 
 export const fetchPersonById = id => async dispatch => {
-  const response = await pipedrive.get(
-    `/persons/${id}?api_token=${api_tokken}`
+  const response = await api.get(
+    `/persons/${id}`
   );
   dispatch({
     type: FETCH_PERSON,
@@ -83,7 +83,7 @@ export const fetchPersonById = id => async dispatch => {
 };
 
 export const addNewPerson = person => async dispatch => {
-  const response = await pipedrive.post(`/persons?api_token=${api_tokken}`, {
+  const response = await api.post(`/persons`, {
     ...person
   });
   dispatch({
@@ -93,7 +93,7 @@ export const addNewPerson = person => async dispatch => {
 };
 
 export const deletePersonById = id => async dispatch => {
-  await pipedrive.delete(`/persons/${id}?api_token=${api_tokken}`);
+  await api.delete(`/persons/${id}`);
   dispatch({
     type: DELETE_PERSON,
     payload: id

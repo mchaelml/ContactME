@@ -1,21 +1,23 @@
 import React from "react";
 import styled from "styled-components";
-import pipedriveLogo from "../images/Pipedrive_Logo.svg";
+import Logo from "../images/Logo.svg";
 
 const NavBarEl = styled.div`
   background-color: #424242;
   padding: 10px;
   padding-left: 15px;
   color: white;
+  align-items: center;
+  display: flex;
 `;
 
-const PipedriveLogo = styled.img`
+const Logos = styled.img`
   height: 30px;
 `;
 
 const NavBar = () => (
   <NavBarEl>
-    <PipedriveLogo src={pipedriveLogo} fill="white" />
+    <Logos src={Logo} fill="white" /> ContactME
   </NavBarEl>
 );
 
